@@ -142,7 +142,10 @@ class ScrewYourNeighborTable {
   actionSwap(player) {
     if (this.players[player] !== this.turn) return;
     const seat = this.seats[this.turn];
-    if (this.turn === this.dealer) {
+    
+    if (seat.card.rank === 'K') {
+      this.actionStay(player);
+    } else if (this.turn === this.dealer) {
       seat.deal(deck.next());
       this.endHand();
     } else {
