@@ -164,7 +164,7 @@ class ScrewYourNeighborTable {
   }
 
   endHand() {
-    const liveSeats = this.liveSeats;
+    let liveSeats = this.liveSeats;
     const low = Math.min(...liveSeats.map(seat => seat.card.rankValue));
     const losers = liveSeats.filter(seat => seat.card.rankValue === low);
     losers.forEach(seat => {
@@ -172,11 +172,14 @@ class ScrewYourNeighborTable {
     });
 
     this.pot += losers.length;
-    // TODO: notify win via callback
+    liveSeats = this.liveSeats;
 
-    if (this.liveSeats.length) {
+    if (liveSeats.length > 1) {
       setTimeout(this.startHand.bind(this), 0);
-    } else {  // tie game
+    } else if (liveSeats.length === 1) {  // TODO: winner winner, chicken dinner
+      // Notify win via callback?
+
+    } else {  // tie game - replay
       this.seats.forEach(seat => {
         if (!seat.isEmpty()) {
           seat.award(this.startingStack);
