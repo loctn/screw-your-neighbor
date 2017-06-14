@@ -102,7 +102,7 @@ class ScrewYourNeighborTable {
   getNextLiveSeat(fromSeatNumber = this.turn) {
     const nextSeatNumber = (fromSeatNumber + 1) % this.seats.length;
     const nextSeat = this.seats[nextSeatNumber];
-    return nextSeat.isLive() ? getNextLiveSeat(nextSeatNumber) : nextSeat;
+    return nextSeat.isLive() ? nextSeat : getNextLiveSeat(nextSeatNumber);
   }
 
   nextDealer() {
@@ -112,14 +112,14 @@ class ScrewYourNeighborTable {
       this.dealer = (this.dealer + 1) % this.seats.length;
     }
 
-    if (this.seats[this.dealer].isLive()) {
+    if (!this.seats[this.dealer].isLive()) {
       this.nextDealer();
     }
   }
 
   nextTurn(fromSeatNumber = this.turn) {
     this.turn = (fromSeatNumber + 1) % this.seats.length;
-    if (this.seats[this.turn].isLive()) {
+    if (!this.seats[this.turn].isLive()) {
       this.nextTurn();
     }
   }
@@ -127,7 +127,7 @@ class ScrewYourNeighborTable {
   deal() {
     this.deck.shuffle();
     this.seats.forEach(seat => {
-      if (!seat.isLive()) {
+      if (seat.isLive()) {
         seat.deal(deck.next());
       }
     });
