@@ -142,7 +142,7 @@ class ScrewYourNeighborTable {
   actionSwap(player) {
     if (this.players[player] !== this.turn) return;
     const seat = this.seats[this.turn];
-    
+
     if (seat.card.rank === 'K') {
       this.actionStay(player);
     } else if (this.turn === this.dealer) {
@@ -167,19 +167,25 @@ class ScrewYourNeighborTable {
   }
 
   endHand() {
-    let liveSeats = this.liveSeats;
+    const liveSeats = this.liveSeats;
     const low = Math.min(...liveSeats.map(seat => seat.card.rankValue));
     const losers = liveSeats.filter(seat => seat.card.rankValue === low);
+
     losers.forEach(seat => {
       seat.award(-1);
     });
-
     this.pot += losers.length;
-    liveSeats = this.liveSeats;
 
-    if (liveSeats.length > 1) {
+    const liveSeatCount = this.liveSeats.length;
+    if (liveSeatCount > 1) {
       setTimeout(this.startHand.bind(this), 0);
-    } else if (liveSeats.length === 1) {  // TODO: winner winner, chicken dinner
+    } else {
+      this.endTourney(liveSeatCount);
+    }
+  }
+
+  endTourney(liveSeatCount) {
+    if (liveSeatCount === 1) {  // TODO: winner winner, chicken dinner
       // Notify win via callback?
 
     } else {  // tie game - replay
