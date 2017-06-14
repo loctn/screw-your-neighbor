@@ -42,18 +42,18 @@ class ScrewYourNeighborSeat {
   }
 
   isLive() {
-    return !this.isEmpty() && this.balance > 0;
+    return !this.isEmpty() && this.stack > 0;
   }
 
   stand() {
     this.player = null;
-    this.balance = 0;
+    this.stack = 0;
     this.undeal();
   }
 
   sit(player, buyin, cb) {
     this.player = player;
-    this.balance = buyin;
+    this.stack = buyin;
     cb();
   }
 
@@ -62,7 +62,7 @@ class ScrewYourNeighborSeat {
   }
 
   award(amount) {
-    this.balance += amount;
+    this.stack += amount;
   }
 
   undeal() {
@@ -79,7 +79,7 @@ class ScrewYourNeighborTable {
   }
 
   get liveSeats() {
-    return this.seats.filter(seat => !seat.isLive());
+    return this.seats.filter(seat => seat.isLive());
   }
 
   stand(player) {
