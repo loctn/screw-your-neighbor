@@ -11,7 +11,7 @@ class Card {
 
 class Deck {
   constructor() {
-    const ranks = '23456789TJQKA'.split('')
+    const ranks = '23456789TJQKA'.split('');
     const suits = 'cdhs'.split('');
     this.cards = [];
     for (let r of ranks) {
@@ -41,6 +41,10 @@ class ScrewYourNeighborSeat {
     return this.player === null;
   }
 
+  isLive() {
+    return !this.isEmpty() && this.balance > 0;
+  }
+
   stand() {
     this.player = null;
     this.balance = 0;
@@ -67,14 +71,15 @@ class ScrewYourNeighborSeat {
 }
 
 class ScrewYourNeighborTable {
-  constructor(seatCount) {
+  constructor(seatCount, startingStack = 3) {
     this.deck = new Deck();
     this.seats = new Array(seatCount).fill(0).map(a => new ScrewYourNeighborSeat());
     this.players = {};
+    this.startingStack = startingStack;
   }
 
-  get playerCount() {
-    return this.seats.length;
+  get liveSeats() {
+    return this.seats.filter(seat => !seat.isLive());
   }
 
   stand(player) {
@@ -82,34 +87,39 @@ class ScrewYourNeighborTable {
     delete this.players[player];
   }
 
-  sit(seatNumber, player, buyin) {
+  sit(seatNumber, player, buyin = this.startingStack) {
     // TODO: check for seating conflict
     this.seat[seatNumber].sit(player, buyin, () => {
       this.players[player] = seatNumber;
     });
   }
 
-  getLeftNonEmptySeat(fromSeatNumber) {
-    const leftSeatNumber = (fromSeatNumber + 1) % this.playerCount;
-    const leftSeat = this.seats[leftSeatNumber];
-    return leftSeat.isEmpty() ? getLeftNonEmptySeat(leftSeatNumber) : leftSeat;
+  startTourney() {
+    this.pot = 0;
+    this.startHand();
+  }
+
+  getNextLiveSeat(fromSeatNumber = this.turn) {
+    const nextSeatNumber = (fromSeatNumber + 1) % this.seats.length;
+    const nextSeat = this.seats[nextSeatNumber];
+    return nextSeat.isLive() ? getNextLiveSeat(nextSeatNumber) : nextSeat;
   }
 
   nextDealer() {
     if (this.dealer === undefined) {
-      this.dealer = Math.floor(Math.random() * this.playerCount);
+      this.dealer = Math.floor(Math.random() * this.seats.length);
     } else {
-      this.dealer = (this.dealer + 1) % this.playerCount;
+      this.dealer = (this.dealer + 1) % this.seats.length;
     }
 
-    if (this.seats[this.dealer].isEmpty()) {
+    if (this.seats[this.dealer].isLive()) {
       this.nextDealer();
     }
   }
 
   nextTurn(fromSeatNumber = this.turn) {
-    this.turn = (fromSeatNumber + 1) % this.playerCount;
-    if (this.seats[this.turn].isEmpty()) {
+    this.turn = (fromSeatNumber + 1) % this.seats.length;
+    if (this.seats[this.turn].isLive()) {
       this.nextTurn();
     }
   }
@@ -117,7 +127,7 @@ class ScrewYourNeighborTable {
   deal() {
     this.deck.shuffle();
     this.seats.forEach(seat => {
-      if (!seat.isEmpty()) {
+      if (!seat.isLive()) {
         seat.deal(deck.next());
       }
     });
@@ -136,7 +146,7 @@ class ScrewYourNeighborTable {
       seat.deal(deck.next());
       this.endHand();
     } else {
-      const leftSeat = this.getLeftNonEmptySeat(this.turn);
+      const leftSeat = this.getNextLiveSeat();
       if (leftSeat.card.rank !== 'K') {
         [seat.card, leftSeat.card] = [leftSeat.card, seat.card];
       }
@@ -154,7 +164,25 @@ class ScrewYourNeighborTable {
   }
 
   endHand() {
-    // TODO: evaluate losing hands
-    // TODO: decrement balances and start another round
+    const liveSeats = this.liveSeats;
+    const low = Math.min(...liveSeats.map(seat => seat.card.rankValue));
+    const losers = liveSeats.filter(seat => seat.card.rankValue === low);
+    losers.forEach(seat => {
+      seat.award(-1);
+    });
+
+    this.pot += losers.length;
+    // TODO: notify win via callback
+
+    if (this.liveSeats.length) {
+      setTimeout(this.startHand.bind(this), 0);
+    } else {  // tie game
+      this.seats.forEach(seat => {
+        if (!seat.isEmpty()) {
+          seat.award(this.startingStack);
+        }
+      });
+      setTimeout(this.startTourney.bind(this), 0);
+    }
   }
 }
