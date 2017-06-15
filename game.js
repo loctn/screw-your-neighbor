@@ -180,21 +180,21 @@ class ScrewYourNeighborTable {
     if (liveSeatCount > 1) {
       setTimeout(this.startHand.bind(this), 0);
     } else {
-      this.endTourney(liveSeatCount);
+      this.endTourney(liveSeatCount === 0);
     }
   }
 
-  endTourney(liveSeatCount) {
-    if (liveSeatCount === 1) {  // TODO: winner winner, chicken dinner
-      // Notify win via callback?
-
-    } else {  // tie game - replay
+  endTourney(isTie) {
+    if (isTie) {
       this.seats.forEach(seat => {
         if (!seat.isEmpty()) {
           seat.award(this.startingStack);
         }
       });
       setTimeout(this.startTourney.bind(this), 0);
+    } else {  // TODO: winner winner, chicken dinner
+      // Notify win via callback?
+
     }
   }
 }
