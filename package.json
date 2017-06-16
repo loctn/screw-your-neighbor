@@ -1,0 +1,22 @@
+{
+  "name": "screw-your-neighbor",
+  "version": "1.0.0",
+  "description": "Card game",
+  "main": "game.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jarrettch/screw-your-neighbor.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jarrettch/screw-your-neighbor/issues"
+  },
+  "homepage": "https://github.com/jarrettch/screw-your-neighbor#readme",
+  "devDependencies": {
+    "jest": "^20.0.4"
+  }
+}
