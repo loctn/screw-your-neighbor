@@ -1,22 +1,14 @@
 {
   "name": "screw-your-neighbor",
-  "version": "1.0.0",
-  "description": "Card game",
+  "version": "0.0.0",
+  "description": "The card game Screw Your Neighbor",
   "main": "game.js",
   "scripts": {
     "test": "jest"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/loctn/screw-your-neighbor.git"
-  },
-  "author": "",
+  "repository": "loctn/screw-your-neighbor",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/loctn/screw-your-neighbor/issues"
-  },
-  "homepage": "https://github.com/loctn/screw-your-neighbor#readme",
   "devDependencies": {
-    "jest": "^20.0.4"
+    "jest": "20.0.4"
   }
 }
