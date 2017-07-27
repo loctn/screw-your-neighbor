@@ -1,24 +1,27 @@
 class Card {
   constructor(rank, suit) {
-    this.rank = rank;
-    this.suit = suit;
+    this.rank = rank
+    this.suit = suit
   }
 
-  get rankValue {
-    return '23456789TJQKA'.indexOf(this.rank);
+  get rankValue() {
+    return '23456789TJQKA'.indexOf(this.rank)
+  }
+}
+
+const ranks = '23456789TJQKA'.split('');
+const suits = 'cdhs'.split('');
+const baseDeck = [];
+
+for (const r of ranks) {
+  for (const s of suits) {
+    baseDeck.push(new Card(r, s));
   }
 }
 
 class Deck {
   constructor() {
-    const ranks = '23456789TJQKA'.split('');
-    const suits = 'cdhs'.split('');
-    this.cards = [];
-    for (let r of ranks) {
-      for (let s of suits) {
-        this.cards.push(new Card(r, s));
-      }
-    }
+    this.cards = baseDeck.slice(0);
     this.shuffle();
   }
 
