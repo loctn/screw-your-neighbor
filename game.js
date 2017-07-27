@@ -9,181 +9,181 @@ class Card {
   }
 }
 
-const ranks = '23456789TJQKA'.split('');
-const suits = 'cdhs'.split('');
-const baseDeck = [];
+const ranks = '23456789TJQKA'.split('')
+const suits = 'cdhs'.split('')
+const baseDeck = []
 
 for (const r of ranks) {
   for (const s of suits) {
-    baseDeck.push(new Card(r, s));
+    baseDeck.push(new Card(r, s))
   }
 }
 
 class Deck {
   constructor() {
-    this.cards = baseDeck.slice(0);
-    this.shuffle();
+    this.cards = baseDeck.slice(0)
+    this.shuffle()
   }
 
   shuffle() {
-    this.cards.sort((a, b) => 0.5 - Math.random());  // TODO: Fisher-Yates
-    this.i = 0;
+    this.cards.sort((a, b) => 0.5 - Math.random())  // TODO: Fisher-Yates
+    this.i = 0
   }
 
   next() {
-    return this.cards[i++];
+    return this.cards[i++]
   }
 }
 
 class ScrewYourNeighborSeat {
   constructor() {
-    this.stand();
+    this.stand()
   }
 
   isEmpty() {
-    return this.player === null;
+    return this.player === null
   }
 
   isLive() {
-    return !this.isEmpty() && this.stack > 0;
+    return !this.isEmpty() && this.stack > 0
   }
 
   stand() {
-    this.player = null;
-    this.stack = 0;
-    this.undeal();
+    this.player = null
+    this.stack = 0
+    this.undeal()
   }
 
   sit(player, buyin, cb) {
-    this.player = player;
-    this.stack = buyin;
-    cb();
+    this.player = player
+    this.stack = buyin
+    cb()
   }
 
   deal(card) {
-    this.card = card;
+    this.card = card
   }
 
   award(amount) {
-    this.stack += amount;
+    this.stack += amount
   }
 
   undeal() {
-    this.card = null;
+    this.card = null
   }
 }
 
 class ScrewYourNeighborTable {
   constructor(seatCount, startingStack = 3) {
-    this.deck = new Deck();
-    this.seats = new Array(seatCount).fill(0).map(a => new ScrewYourNeighborSeat());
-    this.players = {};
-    this.startingStack = startingStack;
+    this.deck = new Deck()
+    this.seats = new Array(seatCount).fill(0).map(a => new ScrewYourNeighborSeat())
+    this.players = {}
+    this.startingStack = startingStack
   }
 
   get liveSeats() {
-    return this.seats.filter(seat => seat.isLive());
+    return this.seats.filter(seat => seat.isLive())
   }
 
   stand(player) {
-    this.seats[this.players[player]].stand();
-    delete this.players[player];
+    this.seats[this.players[player]].stand()
+    delete this.players[player]
   }
 
   sit(seatNumber, player, buyin = this.startingStack) {
     // TODO: check for seating conflict
     this.seat[seatNumber].sit(player, buyin, () => {
-      this.players[player] = seatNumber;
-    });
+      this.players[player] = seatNumber
+    })
   }
 
   startTourney() {
-    this.pot = 0;
-    this.startHand();
+    this.pot = 0
+    this.startHand()
   }
 
   getNextLiveSeat(fromSeatNumber = this.turn) {
-    const nextSeatNumber = (fromSeatNumber + 1) % this.seats.length;
-    const nextSeat = this.seats[nextSeatNumber];
-    return nextSeat.isLive() ? nextSeat : getNextLiveSeat(nextSeatNumber);
+    const nextSeatNumber = (fromSeatNumber + 1) % this.seats.length
+    const nextSeat = this.seats[nextSeatNumber]
+    return nextSeat.isLive() ? nextSeat : getNextLiveSeat(nextSeatNumber)
   }
 
   nextDealer() {
     if (this.dealer === undefined) {
-      this.dealer = Math.floor(Math.random() * this.seats.length);
+      this.dealer = Math.floor(Math.random() * this.seats.length)
     } else {
-      this.dealer = (this.dealer + 1) % this.seats.length;
+      this.dealer = (this.dealer + 1) % this.seats.length
     }
 
     if (!this.seats[this.dealer].isLive()) {
-      this.nextDealer();
+      this.nextDealer()
     }
   }
 
   nextTurn(fromSeatNumber = this.turn) {
-    this.turn = (fromSeatNumber + 1) % this.seats.length;
+    this.turn = (fromSeatNumber + 1) % this.seats.length
     if (!this.seats[this.turn].isLive()) {
-      this.nextTurn();
+      this.nextTurn()
     }
   }
 
   deal() {
-    this.deck.shuffle();
+    this.deck.shuffle()
     this.seats.forEach(seat => {
       if (seat.isLive()) {
-        seat.deal(deck.next());
+        seat.deal(deck.next())
       }
-    });
+    })
   }
 
   startHand() {
-    this.deal();
-    this.nextDealer();
-    this.nextTurn(this.dealer);
+    this.deal()
+    this.nextDealer()
+    this.nextTurn(this.dealer)
   }
 
   actionSwap(player) {
-    if (this.players[player] !== this.turn) return;
-    const seat = this.seats[this.turn];
+    if (this.players[player] !== this.turn) return
+    const seat = this.seats[this.turn]
 
     if (seat.card.rank === 'K') {
-      this.actionStay(player);
+      this.actionStay(player)
     } else if (this.turn === this.dealer) {
-      seat.deal(deck.next());
-      this.endHand();
+      seat.deal(deck.next())
+      this.endHand()
     } else {
-      const leftSeat = this.getNextLiveSeat();
+      const leftSeat = this.getNextLiveSeat()
       if (leftSeat.card.rank !== 'K') {
-        [seat.card, leftSeat.card] = [leftSeat.card, seat.card];
+        ;[seat.card, leftSeat.card] = [leftSeat.card, seat.card]
       }
-      this.nextTurn();
+      this.nextTurn()
     }
   }
 
   actionStay(player) {
-    if (this.players[player] !== this.turn) return;
+    if (this.players[player] !== this.turn) return
     if (this.turn === this.dealer) {
-      this.endHand();
+      this.endHand()
     } else {
-      this.nextTurn();
+      this.nextTurn()
     }
   }
 
   endHand() {
-    const liveSeats = this.liveSeats;
-    const low = Math.min(...liveSeats.map(seat => seat.card.rankValue));
-    const losers = liveSeats.filter(seat => seat.card.rankValue === low);
+    const liveSeats = this.liveSeats
+    const low = Math.min(...liveSeats.map(seat => seat.card.rankValue))
+    const losers = liveSeats.filter(seat => seat.card.rankValue === low)
 
     losers.forEach(seat => {
-      seat.award(-1);
-    });
-    this.pot += losers.length;
+      seat.award(-1)
+    })
+    this.pot += losers.length
 
-    const liveSeatCount = this.liveSeats.length;
+    const liveSeatCount = this.liveSeats.length
     if (liveSeatCount > 1) {
-      setTimeout(this.startHand.bind(this), 0);
+      setTimeout(this.startHand.bind(this), 0)
     } else {
-      this.endTourney(liveSeatCount === 0);
+      this.endTourney(liveSeatCount === 0)
     }
   }
 
@@ -191,10 +191,10 @@ class ScrewYourNeighborTable {
     if (isTie) {
       this.seats.forEach(seat => {
         if (!seat.isEmpty()) {
-          seat.award(this.startingStack);
+          seat.award(this.startingStack)
         }
-      });
-      setTimeout(this.startTourney.bind(this), 0);
+      })
+      setTimeout(this.startTourney.bind(this), 0)
     } else {  // TODO: winner winner, chicken dinner
       // Notify win via callback?
 
